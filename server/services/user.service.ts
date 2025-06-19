@@ -103,4 +103,5 @@ export const updateUser = async (
   } catch (error) {
     return { error: `Error occurred when updating user: ${error}` };
   }
+  
 };
