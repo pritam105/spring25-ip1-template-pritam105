@@ -33,6 +33,15 @@ describe('User model', () => {
     });
 
     // TODO: Task 1 - Write additional test cases for saveUser
+    it('should return an error if user creation fails', async () => {
+      mockingoose(UserModel).toReturn(new Error('DB Error'), 'create');
+
+      const result = await saveUser(user);
+
+      expect('error' in result).toBe(true);
+      expect(result).toHaveProperty('error');
+    });
+
   });
 });
 
@@ -51,6 +60,23 @@ describe('getUserByUsername', () => {
   });
 
   // TODO: Task 1 - Write additional test cases for getUserByUsername
+  it('should return an error if user is not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOne');
+
+    const result = await getUserByUsername(user.username);
+
+    expect('error' in result).toBe(true);
+    expect(result).toHaveProperty('error');
+  });
+
+  it('should return an error if database fails', async () => {
+    mockingoose(UserModel).toReturn(new Error('DB failure'), 'findOne');
+
+    const result = await getUserByUsername(user.username);
+
+    expect(result).toHaveProperty('error');
+  });
+
 });
 
 describe('loginUser', () => {
@@ -73,6 +99,27 @@ describe('loginUser', () => {
   });
 
   // TODO: Task 1 - Write additional test cases for loginUser
+  it('should return an error if loginUser cannot find user', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOne');
+
+    const credentials: UserCredentials = {
+      username: user.username,
+      password: user.password,
+    };
+
+    const result = await loginUser(credentials);
+
+    expect(result).toHaveProperty('error');
+  });
+
+  it('should return an error if DB call fails in loginUser', async () => {
+    mockingoose(UserModel).toReturn(new Error('Login DB error'), 'findOne');
+
+    const result = await loginUser({ username: user.username, password: 'test' });
+
+    expect(result).toHaveProperty('error');
+  });
+
 });
 
 describe('deleteUserByUsername', () => {
@@ -90,6 +137,22 @@ describe('deleteUserByUsername', () => {
   });
 
   // TODO: Task 1 - Write additional test cases for deleteUserByUsername
+  it('should return an error if user to delete is not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndDelete');
+
+    const result = await deleteUserByUsername(user.username);
+
+    expect(result).toHaveProperty('error');
+  });
+
+  it('should return an error if delete operation fails', async () => {
+    mockingoose(UserModel).toReturn(new Error('DB delete error'), 'findOneAndDelete');
+
+    const result = await deleteUserByUsername(user.username);
+
+    expect(result).toHaveProperty('error');
+  });
+
 });
 
 describe('updateUser', () => {
@@ -123,4 +186,19 @@ describe('updateUser', () => {
   });
 
   // TODO: Task 1 - Write additional test cases for updateUser
+  it('should return an error if updated user is not found', async () => {
+    mockingoose(UserModel).toReturn(null, 'findOneAndUpdate');
+
+    const result = await updateUser(user.username, { password: 'newpass' });
+
+    expect(result).toHaveProperty('error');
+  });
+
+  it('should return an error if DB update fails', async () => {
+    mockingoose(UserModel).toReturn(new Error('DB update error'), 'findOneAndUpdate');
+
+    const result = await updateUser(user.username, { password: 'newpass' });
+
+    expect(result).toHaveProperty('error');
+  });
 });
