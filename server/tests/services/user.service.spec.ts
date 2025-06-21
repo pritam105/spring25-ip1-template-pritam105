@@ -34,14 +34,12 @@ describe('User model', () => {
 
     // TODO: Task 1 - Write additional test cases for saveUser
     it('should return an error if user creation fails', async () => {
-      mockingoose(UserModel).toReturn(new Error('DB Error'), 'create');
+      jest.spyOn(UserModel, 'create').mockRejectedValueOnce(new Error('DB Error'));
 
       const result = await saveUser(user);
 
       expect('error' in result).toBe(true);
-      expect(result).toHaveProperty('error');
     });
-
   });
 });
 
@@ -60,7 +58,7 @@ describe('getUserByUsername', () => {
   });
 
   // TODO: Task 1 - Write additional test cases for getUserByUsername
-  it('should return an error if user is not found', async () => {
+  it('should return an error if user not found', async () => {
     mockingoose(UserModel).toReturn(null, 'findOne');
 
     const result = await getUserByUsername(user.username);
@@ -70,13 +68,12 @@ describe('getUserByUsername', () => {
   });
 
   it('should return an error if database fails', async () => {
-    mockingoose(UserModel).toReturn(new Error('DB failure'), 'findOne');
+    jest.spyOn(UserModel, 'findOne').mockRejectedValueOnce(new Error('DB failure'));
 
     const result = await getUserByUsername(user.username);
 
-    expect(result).toHaveProperty('error');
+    expect('error' in result).toBe(true);
   });
-
 });
 
 describe('loginUser', () => {
@@ -119,7 +116,6 @@ describe('loginUser', () => {
 
     expect(result).toHaveProperty('error');
   });
-
 });
 
 describe('deleteUserByUsername', () => {
@@ -152,7 +148,6 @@ describe('deleteUserByUsername', () => {
 
     expect(result).toHaveProperty('error');
   });
-
 });
 
 describe('updateUser', () => {

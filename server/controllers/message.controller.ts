@@ -47,14 +47,12 @@ const messageController = (socket: FakeSOSocket) => {
      * Note: you will need to uncomment the line below. Refer to other controller files for guidance.
      * This emits a message update event to the client. When should you emit this event? You can find the socket event definition in the server/types/socket.d.ts file.
      */
-    // socket.emit('messageUpdate', { msg: msgFromDb });
     if (!isRequestValid(req)) {
       res.status(400).send('Invalid request');
       return;
     }
 
     const { messageToAdd: msg } = req.body;
-
     if (!isMessageValid(msg)) {
       res.status(400).send('Invalid message body');
       return;
@@ -69,9 +67,8 @@ const messageController = (socket: FakeSOSocket) => {
       }
 
       socket.emit('messageUpdate', { msg: msgFromDb });
-
       res.json(msgFromDb);
-    } catch (err: unknown) {
+    } catch (err) {
       res.status(500).send(`Error when adding a message: ${(err as Error).message}`);
     }
   };

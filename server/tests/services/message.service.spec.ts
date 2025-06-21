@@ -19,13 +19,10 @@ const message2 = {
 describe('Message model', () => {
   beforeEach(() => {
     mockingoose.resetAll();
+    jest.clearAllMocks();
   });
 
   describe('saveMessage', () => {
-    beforeEach(() => {
-      mockingoose.resetAll();
-    });
-
     it('should return the saved message', async () => {
       mockingoose(MessageModel).toReturn(message1, 'create');
 
@@ -37,11 +34,11 @@ describe('Message model', () => {
     it('should return an error if saving the message fails', async () => {
       const errorMsg = 'Database create error';
 
-      mockingoose(MessageModel).toReturn(new Error(errorMsg), 'create');
+      jest.spyOn(MessageModel, 'create').mockRejectedValueOnce(new Error(errorMsg));
 
       const result = await saveMessage(message1);
 
-      expect(result).toHaveProperty('error');
+      expect('error' in result).toBe(true);
     });
   });
 
@@ -55,7 +52,7 @@ describe('Message model', () => {
     });
     // TODO: Task 2 - Write a test case for getMessages when an error occurs
     it('should return an empty array if fetching messages fails', async () => {
-      mockingoose(MessageModel).toReturn(new Error('Database find error'), 'find');
+      jest.spyOn(MessageModel, 'find').mockRejectedValueOnce(() => new Error('DB error'));
 
       const result = await getMessages();
 

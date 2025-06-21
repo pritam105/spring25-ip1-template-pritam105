@@ -29,7 +29,8 @@ export const saveMessage = async (message: Message): Promise<MessageResponse> =>
 export const getMessages = async (): Promise<Message[]> => {
   // TODO: Task 2 - Implement the getMessages function
   try {
-    const messages = await MessageModel.find().sort({ msgDateTime: 1 });
+    const messages = await MessageModel.find();
+    messages.sort((a, b) => a.msgDateTime.getTime() - b.msgDateTime.getTime());
     return messages;
   } catch (error) {
     return [];

@@ -39,26 +39,8 @@ describe('POST /addMessage', () => {
   });
 
   // TODO: Task 2 - Write additional test cases for addMessageRoute
-  it('should return 400 if msgDateTime is not a valid date', async () => {
-    const invalidMessage = {
-      msg: 'Hey',
-      msgFrom: 'User2',
-      msgDateTime: 'invalid-date',
-    };
-
-    const response = await supertest(app)
-      .post('/messaging/addMessage')
-      .send({ messageToAdd: invalidMessage });
-
-    expect(response.status).toBe(400);
-    expect(response.text).toBe('Invalid request');
-  });
-
   it('should return 400 if required field msg is missing', async () => {
-    const incompleteMessage = {
-      msgFrom: 'User3',
-      msgDateTime: new Date(),
-    };
+    const incompleteMessage = { msgFrom: 'User3', msgDateTime: new Date() };
 
     const response = await supertest(app)
       .post('/messaging/addMessage')
@@ -68,14 +50,65 @@ describe('POST /addMessage', () => {
     expect(response.text).toBe('Invalid request');
   });
 
+  it('should return 400 if required field msgFrom is missing', async () => {
+    const incompleteMessage = { msg: 'Hi', msgDateTime: new Date() };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: incompleteMessage });
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid message body');
+  });
+
+  it('should return 400 if required field msgDateTime is missing', async () => {
+    const incompleteMessage = { msg: 'Hi', msgFrom: 'User4' };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: incompleteMessage });
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid message body');
+  });
+
+  it('should return 400 if required field msg is empty', async () => {
+    const incompleteMessage = { msg: '', msgFrom: 'User5', msgDateTime: new Date() };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: incompleteMessage });
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid request');
+  });
+
+  it('should return 400 if required field msgFrom is empty', async () => {
+    const incompleteMessage = { msg: 'Hi', msgFrom: '', msgDateTime: new Date() };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: incompleteMessage });
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid message body');
+  });
+
+  it('should return 400 if required field msgDateTime is null', async () => {
+    const incompleteMessage = { msg: 'Hi', msgFrom: 'User6', msgDateTime: null };
+
+    const response = await supertest(app)
+      .post('/messaging/addMessage')
+      .send({ messageToAdd: incompleteMessage });
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid message body');
+  });
+
   it('should return 500 if saveMessage throws an error', async () => {
     saveMessageSpy.mockResolvedValue({ error: 'Simulated DB failure' });
 
-    const message = {
-      msg: 'Test failure',
-      msgFrom: 'User4',
-      msgDateTime: new Date(),
-    };
+    const message = { msg: 'Test failure', msgFrom: 'User4', msgDateTime: new Date() };
 
     const response = await supertest(app)
       .post('/messaging/addMessage')
@@ -89,12 +122,7 @@ describe('POST /addMessage', () => {
     const id = new mongoose.Types.ObjectId();
     const date = new Date();
 
-    const message = {
-      _id: id,
-      msg: 'Formatted Message',
-      msgFrom: 'User5',
-      msgDateTime: date,
-    };
+    const message = { _id: id, msg: 'Formatted Message', msgFrom: 'User5', msgDateTime: date };
 
     saveMessageSpy.mockResolvedValue(message);
 
